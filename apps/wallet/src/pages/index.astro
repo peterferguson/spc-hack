@@ -1,7 +1,12 @@
 ---
 import "../../public/global.css";
+import { UsernameForm } from "../components/forms/username";
 
-import { Button } from "@/components/ui/button";
+const isDev = import.meta.env.DEV;
+const domain = isDev ? "loca.lt" : "web.app";
+const payeeOrigin = `https://spc-dapp.${domain}`;
+
+// - handle the form submission
 ---
 
 <html lang="en">
@@ -10,11 +15,11 @@ import { Button } from "@/components/ui/button";
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>SPC Wallet</title>
 	</head>
-	<body>
-		<h1>Astro</h1>
+	<body class="flex flex-col items-center justify-center h-screen">
+		<h1>SPC Wallet</h1>
 
-		<Button>Hello World</Button>
+		<UsernameForm client:only />
 	</body>
 </html>
