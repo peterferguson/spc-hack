@@ -22,16 +22,60 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig {
     uint256[2] internal publicKey;
     uint256[2] internal publicKey2;
 
+    /// -----------------------------------------------------------------------
+    /// Setup
+    /// -----------------------------------------------------------------------
+
     function setUp() public {
         deployOnitAccount();
     }
 
+    // See https://github.com/safe-global/safe-modules/modules/4337/README.md
     function deployOnitAccount() internal {
         // Deploy module with passkey
         safe4337Module = new Safe4337Module(entryPointAddress, publicKey);
+
+        address[] memory modules = new address[](1);
+        modules[0] = address(safe4337Module);
+
+        // Placeholder owners since we use a passkey signer only
+        address[] memory owners = new address[](1);
+        owners[0] = address(0xdead);
+
+        bytes memory initializer = abi.encodeWithSignature(
+            "setup(address[],uint256,address,bytes,address,address,uint256,address)",
+            owners,
+            1,
+            address(addModulesLib),
+            abi.encodeWithSignature("enableModules(address[])", modules),
+            address(safe4337Module),
+            address(0),
+            0,
+            address(0)
+        );
+
+        // bytes memory initCallData =
+        //     abi.encodeWithSignature("createProxyWithNonce(address,bytes,uint256)", address(singleton), initializer, 99);
+
+        // bytes memory initCode = abi.encodePacked(address(proxyFactory), initCallData);
+
+        onitAccountAddress = payable(proxyFactory.createProxyWithNonce(address(singleton), initializer, 99));
+        onitAccount = Safe(onitAccountAddress);
     }
 
-    function test_Increment() public {
-        assertEq(address(0), address(0));
+    /// -----------------------------------------------------------------------
+    /// Setup tests
+    /// -----------------------------------------------------------------------
+
+    function testOnitAccountDeployedCorrectly() public {
+        assertEq(onitAccount.getOwners()[0], address(0xdead));
+        assertEq(onitAccount.getThreshold(), 1);
+        assertTrue(onitAccount.isModuleEnabled(address(safe4337Module)));
+
+        assertEq(address(safe4337Module.entryPoint()), entryPointAddress);
+        assertEq(safe4337Module.owner()[0], publicKey[0]);
+        assertEq(safe4337Module.owner()[1], publicKey[1]);
     }
+
+    // test that entrypoint and other values are set correctly
 }
