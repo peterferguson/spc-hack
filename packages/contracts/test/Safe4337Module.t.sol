@@ -5,6 +5,7 @@ pragma solidity ^0.8.13;
 import {Test, console2} from "forge-std/Test.sol";
 import {ERC4337TestConfig, PackedUserOperation} from "./config/ERC4337TestConfig.t.sol";
 import {SafeTestConfig, Safe} from "./config/SafeTestConfig.t.sol";
+import {AddressTestConfig} from "./config/AddressTestConfig.t.sol";
 
 // Webauthn formatting util
 import {WebAuthnUtils, WebAuthnInfo} from "../src/utils/WebAuthnUtils.sol";
@@ -13,7 +14,7 @@ import {WebAuthn} from "../lib/webauthn-sol/src/WebAuthn.sol";
 // Safe Module for testing
 import {Safe4337Module} from "../src/safe-4337-module/Safe4337Module.sol";
 
-contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig {
+contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig, AddressTestConfig {
     // The Onit account is a Safe controlled by an ERC4337 module with passkey signer
     Safe internal onitAccount;
     address payable internal onitAccountAddress;
@@ -26,6 +27,15 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig {
     uint256[2] internal publicKey;
     uint256[2] internal publicKey2;
 
+    // Tmp public key for testing with base auth data
+    uint256[2] internal pk = [
+        0x1c05286fe694493eae33312f2d2e0d0abeda8db76238b7a204be1fb87f54ce42,
+        0x28fef61ef4ac300f631657635c28e59bfb2fe71bce1634c81c65642042f6dc4d
+    ];
+
+    // Tmp private key for testing with base auth data
+    uint256 passkeyPrivateKey = uint256(0x03d99692017473e2d631945a812607b23269d85721e0f370b8d3e7d29a874fd2);
+
     /// -----------------------------------------------------------------------
     /// Setup
     /// -----------------------------------------------------------------------
@@ -37,7 +47,7 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig {
     // See https://github.com/safe-global/safe-modules/modules/4337/README.md
     function deployOnitAccount() internal {
         // Deploy module with passkey
-        safe4337Module = new Safe4337Module(entryPointAddress, publicKey);
+        safe4337Module = new Safe4337Module(entryPointAddress, pk);
 
         address[] memory modules = new address[](1);
         modules[0] = address(safe4337Module);
@@ -77,8 +87,8 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig {
         assertTrue(onitAccount.isModuleEnabled(address(safe4337Module)));
 
         assertEq(address(safe4337Module.entryPoint()), entryPointAddress);
-        assertEq(safe4337Module.owner()[0], publicKey[0]);
-        assertEq(safe4337Module.owner()[1], publicKey[1]);
+        assertEq(safe4337Module.owner()[0], pk[0]);
+        assertEq(safe4337Module.owner()[1], pk[1]);
     }
 
     // test that entrypoint and other values are set correctly
@@ -102,9 +112,9 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig {
         string memory origin = "https://sign.coinbase.com";
         WebAuthnInfo memory webAuthn = WebAuthnUtils.getWebAuthnStruct(challenge, authenticatorData, origin);
 
-        string memory mnemonic = "test test test test test test test test test test test junk";
-        uint256 privateKey = vm.deriveKey(mnemonic, 0);
-        (bytes32 r, bytes32 s) = vm.signP256(uint256(123), challenge);
+        // string memory mnemonic = "test test test test test test test test test test test junk";
+        // uint256 privateKey = vm.deriveKey(mnemonic, 0);
+        (bytes32 r, bytes32 s) = vm.signP256(passkeyPrivateKey, webAuthn.messageHash);
 
         // Format the signature data
         bytes memory pksig = abi.encode(
@@ -123,6 +133,6 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig {
         userOps[0] = userOp;
 
         vm.prank(entryPointAddress);
-        entryPoint.handleOps(userOps, payable(0));
+        entryPoint.handleOps(userOps, payable(alice));
     }
 }
