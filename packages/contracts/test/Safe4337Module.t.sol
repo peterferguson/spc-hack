@@ -112,8 +112,6 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig, AddressT
         string memory origin = "https://sign.coinbase.com";
         WebAuthnInfo memory webAuthn = WebAuthnUtils.getWebAuthnStruct(challenge, authenticatorData, origin);
 
-        // string memory mnemonic = "test test test test test test test test test test test junk";
-        // uint256 privateKey = vm.deriveKey(mnemonic, 0);
         (bytes32 r, bytes32 s) = vm.signP256(passkeyPrivateKey, webAuthn.messageHash);
 
         // Format the signature data
@@ -137,5 +135,43 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig, AddressT
         (, bytes memory validationData) = onitAccountAddress.call(validateUserOpCalldata);
 
         assertEq(keccak256(validationData), keccak256(abi.encodePacked(uint256(0))));
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Execution tests
+    /// -----------------------------------------------------------------------
+
+    function testExecuteTx() public {
+        // Some transfer user operation
+        bytes memory transferData = abi.encodeWithSignature("transfer(address,uint256)", address(0xdead), 100);
+        PackedUserOperation memory userOp = buildUserOp(onitAccountAddress, 0, new bytes(0), transferData);
+
+        // Get the webauthn struct which will be verified by the module
+        bytes32 challenge = entryPoint.getUserOpHash(userOp);
+        bytes memory authenticatorData = hex"49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000";
+        string memory origin = "https://sign.coinbase.com";
+        WebAuthnInfo memory webAuthn = WebAuthnUtils.getWebAuthnStruct(challenge, authenticatorData, origin);
+
+        (bytes32 r, bytes32 s) = vm.signP256(passkeyPrivateKey, webAuthn.messageHash);
+
+        // Format the signature data
+        bytes memory pksig = abi.encode(
+            WebAuthn.WebAuthnAuth({
+                authenticatorData: webAuthn.authenticatorData,
+                clientDataJSON: webAuthn.clientDataJSON,
+                typeIndex: 1,
+                challengeIndex: 23,
+                r: uint256(r),
+                s: uint256(s)
+            })
+        );
+
+        PackedUserOperation[] memory userOps = new PackedUserOperation[](1);
+        userOps[0] = userOp;
+        userOp.signature = pksig;
+
+        entryPoint.handleOps(userOps, payable(alice));
+
+        //assertEq(keccak256(validationData), keccak256(abi.encodePacked(uint256(0))));
     }
 }

@@ -20,8 +20,6 @@ import "forge-std/console.sol";
 
 /**
  * TODO
- * - add execution function
- * - fix verify sig
  */
 contract Safe4337Module is BaseAccount, HandlerContext {
     /// ----------------------------------------------------------------------------------------
@@ -85,33 +83,17 @@ contract Safe4337Module is BaseAccount, HandlerContext {
     }
 
     /**
-     * Execute a call but also revert if the execution fails.
-     * The default behavior of the Safe is to not revert if the call fails,
-     * which is challenging for integrating with ERC4337 because then the
-     * EntryPoint wouldn't know to emit the UserOperationRevertReason event,
-     * which the frontend/client uses to capture the reason for the failure.
+     * @notice Executes a user operation provided by the entry point.
+     * @param to Destination address of the user operation.
+     * @param value Ether value of the user operation.
+     * @param data Data payload of the user operation.
+     * @param operation Operation type of the user operation.
      */
-    // function executeAndRevert(
-    //     address to,
-    //     uint256 value,
-    //     bytes memory data,
-    //     Enum.Operation operation
-    // ) external payable {
-    //     _requireFromEntryPoint();
+    function executeUserOp(address to, uint256 value, bytes memory data, uint8 operation) external {
+        _requireFromEntryPoint();
 
-    //     bool success = execute(to, value, data, operation, type(uint256).max);
-
-    //     bytes memory returnData = Exec.getReturnData(type(uint256).max);
-    //     // Revert with the actual reason string
-    //     // Adopted from: https://github.com/Uniswap/v3-periphery/blob/464a8a49611272f7349c970e0fadb7ec1d3c1086/contracts/base/Multicall.sol#L16-L23
-    //     if (!success) {
-    //         if (returnData.length < 68) revert();
-    //         assembly {
-    //             returnData := add(returnData, 0x04)
-    //         }
-    //         revert(abi.decode(returnData, (string)));
-    //     }
-    // }
+        require(ISafe(msg.sender).execTransactionFromModule(to, value, data, operation), "Execution failed");
+    }
 
     function entryPoint() public view virtual override returns (IEntryPoint) {
         return IEntryPoint(_entryPoint);
@@ -148,13 +130,6 @@ contract Safe4337Module is BaseAccount, HandlerContext {
         returns (uint256 sigTimeRange)
     {
         WebAuthn.WebAuthnAuth memory auth = abi.decode(userOp.signature, (WebAuthn.WebAuthnAuth));
-
-        console.log("OnitSafeModule: _validateSignature");
-        console.logBytes32(userOpHash);
-        console.logBytes(auth.authenticatorData);
-        console.log(auth.clientDataJSON);
-        console.log(auth.r);
-        console.log(auth.s);
 
         return WebAuthn.verify({
             challenge: abi.encodePacked(userOpHash),
