@@ -3,8 +3,12 @@ pragma solidity ^0.8.13;
 
 // Test imports
 import {Test, console2} from "forge-std/Test.sol";
-import {ERC4337TestConfig} from "./config/ERC4337TestConfig.t.sol";
+import {ERC4337TestConfig, PackedUserOperation} from "./config/ERC4337TestConfig.t.sol";
 import {SafeTestConfig, Safe} from "./config/SafeTestConfig.t.sol";
+
+// Webauthn formatting util
+import {WebAuthnUtils, WebAuthnInfo} from "../src/utils/WebAuthnUtils.sol";
+import {WebAuthn} from "../lib/webauthn-sol/src/WebAuthn.sol";
 
 // Safe Module for testing
 import {Safe4337Module} from "../src/safe-4337-module/Safe4337Module.sol";
@@ -78,4 +82,47 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig {
     }
 
     // test that entrypoint and other values are set correctly
+
+    /// -----------------------------------------------------------------------
+    /// Validation tests
+    /// -----------------------------------------------------------------------
+
+    function testFailsIfNotFromEntryPoint() public {
+        safe4337Module.validateUserOp(userOpBase, entryPoint.getUserOpHash(userOpBase), 0);
+    }
+
+    function testValidateUserOp() public {
+        // Generate some tx calldata and build into a userop
+        bytes memory transferCalldata = abi.encodeWithSignature("transfer(address,uint256)", address(1), 1 ether);
+        PackedUserOperation memory userOp = buildUserOp(onitAccountAddress, 0, new bytes(0), transferCalldata);
+
+        // Get the webauthn struct which will be verified by the module
+        bytes32 challenge = entryPoint.getUserOpHash(userOp);
+        bytes memory authenticatorData = hex"49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000000";
+        string memory origin = "https://sign.coinbase.com";
+        WebAuthnInfo memory webAuthn = WebAuthnUtils.getWebAuthnStruct(challenge, authenticatorData, origin);
+
+        string memory mnemonic = "test test test test test test test test test test test junk";
+        uint256 privateKey = vm.deriveKey(mnemonic, 0);
+        (bytes32 r, bytes32 s) = vm.signP256(uint256(123), challenge);
+
+        // Format the signature data
+        bytes memory pksig = abi.encode(
+            WebAuthn.WebAuthnAuth({
+                authenticatorData: webAuthn.authenticatorData,
+                clientDataJSON: webAuthn.clientDataJSON,
+                typeIndex: 1,
+                challengeIndex: 23,
+                r: uint256(r),
+                s: uint256(s)
+            })
+        );
+
+        PackedUserOperation[] memory userOps = new PackedUserOperation[](1);
+        userOp.signature = pksig;
+        userOps[0] = userOp;
+
+        vm.prank(entryPointAddress);
+        entryPoint.handleOps(userOps, payable(0));
+    }
 }
