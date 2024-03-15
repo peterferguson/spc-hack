@@ -1,16 +1,14 @@
-# Astro Starter Kit: Minimal
+# Secure Payment Confirmation (SPC)-Enabled dApp
 
-```sh
-npm create astro@latest -- --template minimal
-```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+## 💡 Idea
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+SPC is a browser native API that is designed to streamline payments on the web. It's purpose is to streamline the UX for
+authneticating users across merchants (in web3 think dApps) whilst verifiying cryptographically that the user can pay
+for a transaction with their payment provider (think wallet). The protocol is built on-top of webauthn in order to 
+provide the cryptographic proof that the user indeed is the one that initiated the transaction.
 
-## 🚀 Project Structure
+## The Project Structure
 
 Inside of your Astro project, you'll see the following folders and files:
 
