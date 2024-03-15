@@ -48,6 +48,7 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig, AddressT
     function deployOnitAccount() internal {
         // Deploy module with passkey
         safe4337Module = new Safe4337Module(entryPointAddress, pk);
+        safe4337ModuleAddress = address(safe4337Module);
 
         address[] memory modules = new address[](1);
         modules[0] = address(safe4337Module);
@@ -102,9 +103,8 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig, AddressT
     }
 
     function testValidateUserOp() public {
-        // Generate some tx calldata and build into a userop
-        bytes memory transferCalldata = abi.encodeWithSignature("transfer(address,uint256)", address(1), 1 ether);
-        PackedUserOperation memory userOp = buildUserOp(onitAccountAddress, 0, new bytes(0), transferCalldata);
+        // Some basic user operation
+        PackedUserOperation memory userOp = buildUserOp(onitAccountAddress, 0, new bytes(0), new bytes(0));
 
         // Get the webauthn struct which will be verified by the module
         bytes32 challenge = entryPoint.getUserOpHash(userOp);
@@ -127,12 +127,15 @@ contract Safe4337ModuleTest is Test, ERC4337TestConfig, SafeTestConfig, AddressT
                 s: uint256(s)
             })
         );
-
-        PackedUserOperation[] memory userOps = new PackedUserOperation[](1);
         userOp.signature = pksig;
-        userOps[0] = userOp;
 
+        bytes memory validateUserOpCalldata =
+            abi.encodeWithSelector(Safe4337Module.validateUserOp.selector, userOp, challenge, 0);
+
+        // We prank entrypoint and call like this so the safe handler context passes the _requireFromEntryPoint check
         vm.prank(entryPointAddress);
-        entryPoint.handleOps(userOps, payable(alice));
+        (, bytes memory validationData) = onitAccountAddress.call(validateUserOpCalldata);
+
+        assertEq(keccak256(validationData), keccak256(abi.encodePacked(uint256(0))));
     }
 }
