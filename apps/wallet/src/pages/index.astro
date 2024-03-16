@@ -31,22 +31,17 @@ import { UsernameForm } from "../components/forms/username";
 		<UsernameForm client:only />
 	</body>
 	<script>
-		import { pageInIframe, getPaymentOrigin, sendMessage } from "@/lib/utils";
-		const paymentOrigin = getPaymentOrigin();
+		import { pageInIframe, getPayeeOrigin, sendMessage } from "@/lib/utils";
 
 		if (pageInIframe()) {
 			window.addEventListener("message", (e) => {
-				if (e.origin !== paymentOrigin) {
-					return;
-				}
+				if (e.origin !== getPayeeOrigin()) return;
 
 				if (e.data.type === "credentials.get") {
-					console.log("recieved credentials.get message", e.data.message);
-					const credential = window.localStorage.get("credId");
-					console.log("sending available credentials", credential);
+					const credential = localStorage.getItem("credId");
 					sendMessage({
 						type: "credentials.get",
-						availableCredentials: [credential],
+						credentials: [credential],
 					});
 				}
 

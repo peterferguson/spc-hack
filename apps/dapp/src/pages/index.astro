@@ -25,9 +25,7 @@ import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 			const paymentOrigin = getPaymentOrigin();
 
 			window.addEventListener("message", (e) => {
-				if (e.origin !== paymentOrigin) {
-					return;
-				}
+				if (e.origin !== paymentOrigin) return;
 				if (e.data.paid !== undefined) {
 					alert(
 						`Payment ${e.data.paid ? "succeeded" : "failed"}. Credential ${e.data.registered ? "registered" : "not registered"}`,
