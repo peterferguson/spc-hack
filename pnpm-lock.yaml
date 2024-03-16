@@ -17,6 +17,9 @@ importers:
       '@astrojs/check':
         specifier: ^0.5.9
         version: 0.5.9(typescript@5.4.2)
+      '@astrojs/node':
+        specifier: ^8.2.3
+        version: 8.2.3(astro@4.5.4)
       '@astrojs/react':
         specifier: ^3.1.0
         version: 3.1.0(@types/react-dom@18.2.22)(@types/react@18.2.66)(react-dom@18.2.0)(react@18.2.0)(vite@5.1.6)
@@ -246,6 +249,18 @@ packages:
       unist-util-visit: 5.0.0
       unist-util-visit-parents: 6.0.1
       vfile: 6.0.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /@astrojs/node@8.2.3(astro@4.5.4):
+    resolution: {integrity: sha512-VQQy7QIv4X+5dlKCEchYIxMFryS+BwDOFGNzeRmHe1/P819TlNup9/M8XqnWW4aZPxV7P6CoDeFxX6HuT/kOmQ==}
+    peerDependencies:
+      astro: ^4.2.0
+    dependencies:
+      astro: 4.5.4(typescript@5.4.2)
+      send: 0.18.0
+      server-destroy: 1.0.1
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -6804,6 +6819,10 @@ packages:
       send: 0.18.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /server-destroy@1.0.1:
+    resolution: {integrity: sha512-rb+9B5YBIEzYcD6x2VKidaa+cqYBJQKnU4oe4E3ANwRRN56yk/ua1YCJT1n21NTS8w6CcOclAKNP3PhdCXKYtQ==}
     dev: false
 
   /set-function-length@1.2.2:

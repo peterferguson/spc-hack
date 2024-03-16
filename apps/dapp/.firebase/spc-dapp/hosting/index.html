@@ -1,1 +1,17 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v4.5.4"><title>Astro</title></head> <body> <h1>Astro</h1> </body></html>
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v4.5.4"><title>SPC dApp</title><link rel="stylesheet" href="/_astro/index.DkOPPpGE.css" /></head> <body class="flex flex-col items-center justify-center h-screen"> <main class="flex flex-col items-center justify-evenly min-h-[20vh]"> <form id="form" action="https://spc-wallet.web.app/" class="center" target="iframe" method="post"> <h1>SPC dApp</h1> <div id="iframe-container" class="hidden"> <iframe name="iframe" allow="payment https://spc-wallet.web.app"></iframe> </div> <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">Create Payment</button> </form> </main> <script type="module">
+			import { getPaymentOrigin } from "../lib/utils";
+			const paymentOrigin = getPaymentOrigin();
+			window.addEventListener("message", (e) => {
+				if (e.origin !== paymentOrigin) {
+					return;
+				}
+				if (e.data.paid !== undefined) {
+					alert(
+						`Payment ${e.data.paid ? "succeeded" : "failed"}. Credential ${e.data.registered ? "registered" : "not registered"}`,
+					);
+					location.href = "/success";
+				} else {
+					console.log("recieved message", e.data.message);
+				}
+			});
+		</script> </body> </html>
