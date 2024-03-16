@@ -35,7 +35,7 @@ import { UsernameForm } from "../components/forms/username";
 					const credential = localStorage.getItem("credId");
 					sendMessage({
 						type: "credentials.get",
-						credentials: [credential],
+						credentials: credential ? [credential] : [],
 					});
 				}
 

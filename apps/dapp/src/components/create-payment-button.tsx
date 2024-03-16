@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { getPaymentOrigin, payWithSPC } from "@/lib/utils";
 import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
-import {
-	getAllowedCredentialsMessageTypeSchema,
-	getAllowedCredentialsSchema,
-} from "helpers";
+import { getPaymentOrigin, payWithSPC } from "@/lib/utils";
+import { getAllowedCredentialsSchema } from "helpers";
 
 const getIframe = () => {
 	const iframeDialog = document.getElementById(
@@ -24,8 +21,6 @@ const fallbackToIframeCredentialCreation = async () => {
 
 	iframeDialog?.classList.remove("hidden");
 	iframeDialog?.classList.add("flex");
-
-	console.log("iframeDialog", iframeDialog);
 
 	iframeDialog?.showModal();
 };
@@ -59,7 +54,6 @@ const getAvailableCredentials = async () => {
 								event.data,
 							);
 
-							console.log("credentials.get - event.data", parsedMessage);
 							resolve(parsedMessage.credentials);
 						}
 					}
@@ -100,8 +94,6 @@ export function CreatePaymentButton() {
 				e.preventDefault();
 
 				const allowedCredentials = await getAvailableCredentials();
-
-				console.log("credentials", allowedCredentials);
 
 				if (!allowedCredentials || allowedCredentials.length === 0) {
 					return fallbackToIframeCredentialCreation();

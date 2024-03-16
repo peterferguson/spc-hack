@@ -15,8 +15,10 @@ const paymentOrigin = getPaymentOrigin();
 		"backdrop:transition-opacity backdrop:duration-300",
 	)}
 >
-	<iframe class="h-full w-full" name="iframe" allow={`payment ${paymentOrigin}`}
-	></iframe>
+	<iframe
+		class="min-h-[40vh] border-0 m-0"
+		name="iframe"
+		allow={`payment ${paymentOrigin}`}></iframe>
 </dialog>
 <script>
 	import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
@@ -25,8 +27,16 @@ const paymentOrigin = getPaymentOrigin();
 		WALLET_IFRAME_DIALOG_ID,
 	) as HTMLDialogElement | null;
 
-	const iframe = iframeDialog.querySelector("iframe");
+	// - remove the hidden class to show the iframe if present
+	iframeDialog?.classList.remove("hidden");
 
-	iframe.src = getPaymentOrigin();
-	iframeDialog.addEventListener("click", () => dialog.close());
+	const iframe = iframeDialog?.querySelector("iframe");
+
+	if (iframe) iframe.src = getPaymentOrigin();
+
+	iframeDialog?.addEventListener("click", () => {
+		iframeDialog.close();
+		iframeDialog.removeAttribute("open");
+		iframeDialog.classList.add("hidden");
+	});
 </script>
