@@ -16,12 +16,6 @@ import { UsernameForm } from "../components/forms/username";
 
 			if (pageInIframe())
 				document.getElementById("heading")!.style.display = "none";
-			else {
-				const credId = window.localStorage.get("credId");
-				const credentialIdElement = document.getElementById("credential-id");
-
-				if (credentialIdElement) credentialIdElement.innerText = credId;
-			}
 		</script>
 	</head>
 	<body class="flex flex-col items-center justify-center h-screen">
