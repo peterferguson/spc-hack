@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "npx localtunnel --port 4322 -s spc-wallet & astro dev --port 4322 ",
 		"start": "astro dev",
-		"build": "astro build",
+		"build": "astro build --remote",
 		"preview": "astro preview",
 		"astro": "astro"
 	},
