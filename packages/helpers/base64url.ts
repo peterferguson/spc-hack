@@ -24,10 +24,10 @@ export function toBuffer(
  * @param to (optional) The encoding to use, in case it's desirable to encode to base64 instead
  */
 export function fromBuffer(
-	buffer: Uint8Array,
+	buffer: Uint8Array | ArrayBuffer,
 	to: "base64" | "base64url" | "hex" | "ascii" = "base64url",
 ): string {
-	if (to === "ascii") return arrayBufferToString(buffer.buffer);
+	if (to === "ascii") return arrayBufferToString(buffer);
 	if (to === "hex") return arrayBufferToHexString(buffer);
 	return base64.fromArrayBuffer(buffer, to === "base64url");
 }

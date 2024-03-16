@@ -1,10 +1,4 @@
-import {
-	toBase64UrlString,
-	toBuffer,
-	fromBuffer,
-	getDappOrigin,
-	getWalletOrigin,
-} from "helpers";
+import { toBuffer, fromBuffer, getDappOrigin, getWalletOrigin } from "helpers";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -37,13 +31,14 @@ export const registerSpcCredential = async ({
 	userId,
 	challenge,
 }: { userId: string; challenge: string }) => {
+	const rpId = getWalletOrigin({ isDev: import.meta.env.DEV }).replace(
+		"https://",
+		"",
+	);
 	const opts = {
 		challenge: new Uint8Array(),
 		rp: {
-			id: getWalletOrigin({ isDev: import.meta.env.DEV }).replace(
-				"https://",
-				"",
-			),
+			id: rpId,
 			name: "SPC Wallet",
 		},
 		user: {
@@ -84,30 +79,42 @@ export const registerSpcCredential = async ({
 	opts.user.id = toBuffer(userId);
 	opts.challenge = toBuffer(challenge);
 
-	const cred = await navigator.credentials.create({ publicKey: opts });
+	const cred = (await navigator.credentials.create({
+		publicKey: opts,
+	})) as PublicKeyCredential | null;
 
 	if (!cred) throw new Error("No credential returned");
 
-	const credential = {
+	console.log("cred", cred);
+	const response = cred.response as AuthenticatorAttestationResponse;
+
+	const publicKeyBuffer = response.getPublicKey();
+	if (!publicKeyBuffer) throw new Error("No public key returned");
+
+	const serialisableCredential = {
 		id: cred.id,
 		// rawId: window.base64url.encode(cred.rawId),
 		type: cred.type,
+		response: {
+			clientDataJSON: fromBuffer(response.clientDataJSON),
+			attestationObject: fromBuffer(response.attestationObject),
+			publicKey: fromBuffer(publicKeyBuffer),
+		},
 	};
 
-	if (cred.response) {
-		const clientDataJSON = toBase64UrlString(cred.response.clientDataJSON);
-		const attestationObject = toBase64UrlString(
-			cred.response.attestationObject,
-		);
-		credential.response = {
-			clientDataJSON,
-			attestationObject,
-		};
-	}
+	console.log("credential", serialisableCredential);
 
-	localStorage.setItem("credId", credential.id);
+	localStorage.setItem("credId", cred.id);
 
-	// return await _fetch('/auth/registerResponse', credential);
+	return await fetch("/auth/register", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({
+			username: userId,
+			credentialId: cred.id,
+			publicKey: serialisableCredential.response.publicKey,
+		}),
+	});
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
