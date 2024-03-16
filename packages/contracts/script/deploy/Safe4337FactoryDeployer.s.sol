@@ -11,7 +11,7 @@ contract Safe4337FactoryDeployer is Script {
     // v1.4.1
     address public constant SAFE_SINGLETON_ADDRESS = 0x29fcB43b46531BcA003ddC8FCB67FFE91900C762;
     // Deployed in other script
-    address public constant ADD_MODULES_LIB_ADDRESS = 0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67;
+    address public constant ADD_MODULES_LIB_ADDRESS = 0x58E912c126F92cCD3C6856a0d1104a30D5260E2b;
     // v0.7.0
     address public constant ENTRY_POINT_ADDRESS = 0x0000000071727De22E5E9d8BAf0edAc6f37da032;
 
