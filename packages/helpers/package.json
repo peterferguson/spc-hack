@@ -1,16 +1,15 @@
 {
-	"name": "spc-hack",
+	"name": "helpers",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
+	"main": "index.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
 	"author": "",
-	"license": "ISC",
-	"type": "module",
-	"devDependencies": {
-		"@biomejs/biome": "1.6.1"
+	"dependencies": {
+		"@simplewebauthn/server": "^9.0.3",
+		"@hexagon/base64": "^1.1.28"
 	}
 }

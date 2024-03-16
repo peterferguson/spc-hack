@@ -1,16 +1,59 @@
 ---
+import { CreatePaymentButton } from "@/components/create-payment-button";
+import { getPaymentOrigin } from "@/lib/utils";
 
+const paymentOrigin = getPaymentOrigin();
 ---
 
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="stylesheet" href="/global.css" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>SPC dApp</title>
 	</head>
-	<body>
-		<h1>Astro</h1>
+	<body class="flex flex-col items-center justify-center h-screen">
+		<main class="flex flex-col items-center justify-evenly min-h-[20vh]">
+			<!-- <form
+				id="form"
+				action={`${paymentOrigin}/`}
+				class="center"
+				target="iframe"
+				method="post"
+			> -->
+			<h1>SPC dApp</h1>
+
+			<div id="iframe-container" class="hidden">
+				<iframe name="iframe" allow={`payment ${paymentOrigin}`}></iframe>
+			</div>
+
+			<CreatePaymentButton client:only />
+			<!-- </form> -->
+		</main>
+		<script>
+			import { getPaymentOrigin } from "../lib/utils";
+			const paymentOrigin = getPaymentOrigin();
+
+			console.log(
+				"setting up message listeners for paymentOrigin: ",
+				paymentOrigin,
+			);
+
+			window.addEventListener("message", (e) => {
+				if (e.origin !== paymentOrigin) {
+					return;
+				}
+				if (e.data.paid !== undefined) {
+					alert(
+						`Payment ${e.data.paid ? "succeeded" : "failed"}. Credential ${e.data.registered ? "registered" : "not registered"}`,
+					);
+					location.href = "/success";
+				} else {
+					console.log("recieved message", e.data.message);
+				}
+			});
+		</script>
 	</body>
 </html>
