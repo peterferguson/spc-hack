@@ -1,0 +1,12 @@
+@openzeppelin/contracts/=lib/webauthn-sol/lib/openzeppelin-contracts/contracts/
+FreshCryptoLib/=lib/webauthn-sol/lib/FreshCryptoLib/solidity/src/
+account-abstraction/=lib/account-abstraction/contracts/
+ds-test/=lib/safe-tools/lib/forge-std/lib/ds-test/src/
+erc4626-tests/=lib/webauthn-sol/lib/openzeppelin-contracts/lib/erc4626-tests/
+forge-std/=lib/forge-std/src/
+openzeppelin-contracts/=lib/webauthn-sol/lib/openzeppelin-contracts/
+safe-contracts/=lib/safe-tools/lib/safe-contracts/contracts/
+safe-smart-account/=lib/safe-smart-account/
+safe-tools/=lib/safe-tools/src/
+solady/=lib/safe-tools/lib/solady/src/
+webauthn-sol/=lib/webauthn-sol/src/

@@ -1,25 +1,17 @@
-## Foundry
-
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
-
-Foundry consists of:
-
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
 ## Documentation
 
 https://book.getfoundry.sh/
 
+## Deployments
+
+| Contract              |                                                            Address                                                            | Description                                     |
+| :-------------------- | :---------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------- |
+| Add Modules Lib           | [0x58e912c126f92ccd3c6856a0d1104a30d5260e2b](https://sepolia.basescan.org/address/0x58e912c126f92ccd3c6856a0d1104a30d5260e2b#code) | Utility lib for deploying a Safe with enabled modules |
+| Onit Account Factory   | [0x5c2f5064510eddc536d07129d9bacb4cab5276a2](https://sepolia.basescan.org/address/0x5c2f5064510eddc536d07129d9bacb4cab5276a2#code) | Factory for ERC4337 Module controlled Safes                        |
+| 
+
 ## Usage
-
-### Build
-
-```shell
-$ forge build
-```
 
 ### Test
 
@@ -27,40 +19,8 @@ $ forge build
 $ forge test
 ```
 
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
 ### Deploy
 
 ```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --chain-id <chainid> --private-key <your_private_key> --etherscan-api-key <your_etherscan_api_key> --verify --broadcast --legacy
 ```

@@ -1,3 +1,15 @@
 [submodule "packages/contracts/lib/forge-std"]
 	path = packages/contracts/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "packages/contracts/lib/account-abstraction"]
+	path = packages/contracts/lib/account-abstraction
+	url = https://github.com/eth-infinitism/account-abstraction
+[submodule "packages/contracts/lib/safe-smart-account"]
+	path = packages/contracts/lib/safe-smart-account
+	url = https://github.com/safe-global/safe-smart-account
+[submodule "packages/contracts/lib/safe-tools"]
+	path = packages/contracts/lib/safe-tools
+	url = https://github.com/colinnielsen/safe-tools
+[submodule "packages/contracts/lib/webauthn-sol"]
+	path = packages/contracts/lib/webauthn-sol
+	url = https://github.com/base-org/webauthn-sol
