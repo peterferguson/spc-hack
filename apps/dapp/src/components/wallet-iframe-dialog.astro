@@ -1,0 +1,42 @@
+---
+import { cn } from "@/lib/utils";
+import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
+import { getPaymentOrigin } from "@/lib/utils";
+
+const paymentOrigin = getPaymentOrigin();
+---
+
+<dialog
+	id={WALLET_IFRAME_DIALOG_ID}
+	class={cn(
+		"items-center justify-center",
+		"border rounded-lg py-3 px-4 min-h-[40vh]",
+		"backdrop:bg-black backdrop:opacity-50 backdrop:backdrop-blur-md",
+		"backdrop:transition-opacity backdrop:duration-300",
+	)}
+>
+	<iframe
+		class="min-h-[40vh] border-0 m-0"
+		name="iframe"
+		allow={`payment ${paymentOrigin}`}></iframe>
+</dialog>
+<script>
+	import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
+	import { getPaymentOrigin } from "@/lib/utils";
+	const iframeDialog = document.getElementById(
+		WALLET_IFRAME_DIALOG_ID,
+	) as HTMLDialogElement | null;
+
+	// - remove the hidden class to show the iframe if present
+	iframeDialog?.classList.remove("hidden");
+
+	const iframe = iframeDialog?.querySelector("iframe");
+
+	if (iframe) iframe.src = getPaymentOrigin();
+
+	iframeDialog?.addEventListener("click", () => {
+		iframeDialog.close();
+		iframeDialog.removeAttribute("open");
+		iframeDialog.classList.add("hidden");
+	});
+</script>

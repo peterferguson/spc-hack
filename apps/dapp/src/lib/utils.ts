@@ -33,7 +33,7 @@ type SerialisableCredentialRequestOptions = Omit<
 
 export const payWithSPC = async (
 	requestOptions: SerialisableCredentialRequestOptions,
-	amount: PaymentCurrencyAmount,
+	paymentDetails: PaymentDetailsInit,
 	address: Address,
 ) => {
 	const { challenge, timeout } = requestOptions;
@@ -71,9 +71,8 @@ export const payWithSPC = async (
 			},
 		},
 	];
-	const paymentDetails = { total: { label: "Total", amount } };
 
-	console.log("spc paymentMethodData", paymentMethodData);
+	console.log("spc paymentMethodData", paymentMethodData, paymentDetails);
 
 	const request = new PaymentRequest(paymentMethodData, paymentDetails);
 
