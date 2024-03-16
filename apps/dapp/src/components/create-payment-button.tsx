@@ -14,7 +14,7 @@ export function CreatePaymentButton() {
 						timeout: 60000,
 					},
 					{
-						currency: "USD",
+						currency: "USDC",
 						value: "100.00",
 					},
 					"0x",
