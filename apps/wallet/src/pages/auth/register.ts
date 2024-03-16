@@ -7,13 +7,28 @@ const storeCredentialsSchema = z.object({
 	credentialId: z.string(),
 	publicKey: z.string(),
 	userHandle: z.string().optional(),
-	dappName: z.string().optional(),
+	dappName: z
+		.string()
+		.optional()
+		.transform(
+			(v) =>
+				(v?.includes("://") ? new URL(v).hostname : v) ||
+				"spc-wallet.vercel.app",
+		),
 });
 
 export const POST: APIRoute = async (ctx) => {
 	try {
 		const { username, credentialId, publicKey, userHandle, dappName } =
 			storeCredentialsSchema.parse(await ctx.request.json());
+
+		console.log("registering", {
+			username,
+			credentialId,
+			publicKey,
+			userHandle,
+			dappName,
+		});
 
 		await db
 			.insert(Credential)
@@ -27,10 +42,7 @@ export const POST: APIRoute = async (ctx) => {
 
 		await db
 			.insert(ConnectedDapps)
-			.values({
-				dappName: dappName || "https://spc-wallet.vercel.app",
-				credentialId: credentialId,
-			})
+			.values({ dappName, credentialId: credentialId })
 			.execute();
 
 		return new Response(null, { status: 204 });

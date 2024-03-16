@@ -12,9 +12,7 @@ export const getPayeeOrigin = () =>
 export const getPaymentOrigin = () =>
 	getWalletOrigin({ isDev: import.meta.env.DEV });
 
-export function pageInIframe() {
-	return window.location !== window.parent.location;
-}
+export const pageInIframe = () => window.location !== window.parent.location;
 
 /**
  * Utility function to send a message to the parent window
@@ -27,60 +25,61 @@ export const sendMessage = (message: string | Record<string, unknown>) => {
 	);
 };
 
+const defaultSpcOpts = {
+	challenge: new Uint8Array(),
+	rp: {
+		id: getWalletOrigin({ isDev: import.meta.env.DEV }).replace("https://", ""),
+		name: "SPC Wallet",
+	},
+	user: {
+		id: new Uint8Array(),
+		name: "jane.doe@example.com",
+		displayName: "Jane Doe",
+	},
+	pubKeyCredParams: [
+		{ type: "public-key", alg: -7 }, // "ES256"
+	],
+	authenticatorSelection: {
+		userVerification: "required",
+		residentKey: "required",
+		authenticatorAttachment: "platform",
+	},
+	timeout: 360000, // 6 minutes
+
+	// Indicate that this is an SPC credential. This is currently required to
+	// allow credential creation in an iframe, and so that the browser knows this
+	// credential relates to SPC.
+	extensions: {
+		payment: {
+			isPayment: true,
+		},
+	},
+	attestation: "none",
+} satisfies Partial<
+	PublicKeyCredentialCreationOptions & {
+		extensions: PublicKeyCredentialCreationOptions["extensions"] & {
+			payment: { isPayment: boolean };
+		};
+	}
+>;
+
 export const registerSpcCredential = async ({
 	userId,
 	challenge,
 }: { userId: string; challenge: string }) => {
-	const rpId = getWalletOrigin({ isDev: import.meta.env.DEV }).replace(
-		"https://",
-		"",
-	);
-	const opts = {
-		challenge: new Uint8Array(),
-		rp: {
-			id: rpId,
-			name: "SPC Wallet",
-		},
-		user: {
-			id: new Uint8Array(),
-			name: "jane.doe@example.com",
-			displayName: "Jane Doe",
-		},
-		pubKeyCredParams: [
-			{
-				type: "public-key",
-				alg: -7, // "ES256"
-			},
-		],
-		authenticatorSelection: {
-			userVerification: "required",
-			residentKey: "required",
-			authenticatorAttachment: "platform",
-		},
-		timeout: 360000, // 6 minutes
+	const publicKey = { ...defaultSpcOpts };
 
-		// Indicate that this is an SPC credential. This is currently required to
-		// allow credential creation in an iframe, and so that the browser knows this
-		// credential relates to SPC.
-		extensions: {
-			payment: {
-				isPayment: true,
-			},
-		},
-		attestation: "none",
-	} satisfies Partial<
-		PublicKeyCredentialCreationOptions & {
-			extensions: PublicKeyCredentialCreationOptions["extensions"] & {
-				payment: { isPayment: boolean };
-			};
-		}
-	>;
-
-	opts.user.id = toBuffer(userId);
-	opts.challenge = toBuffer(challenge);
+	publicKey.user.displayName = userId;
+	publicKey.user.name = userId;
+	publicKey.user.id = toBuffer(userId);
+	publicKey.challenge = toBuffer(challenge);
 
 	const cred = (await navigator.credentials.create({
-		publicKey: opts,
+		/**
+		 *  `payment` has not been added to the `PublicKeyCredentialCreationOptions`
+		 *  yet but it is available in chrome
+		 *  @ts-expect-error*/
+		publicKey,
 	})) as PublicKeyCredential | null;
 
 	if (!cred) throw new Error("No credential returned");
@@ -113,6 +112,7 @@ export const registerSpcCredential = async ({
 			username: userId,
 			credentialId: cred.id,
 			publicKey: serialisableCredential.response.publicKey,
+			dappName: document.referrer,
 		}),
 	});
 };
