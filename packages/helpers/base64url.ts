@@ -25,8 +25,10 @@ export function toBuffer(
  */
 export function fromBuffer(
 	buffer: Uint8Array,
-	to: "base64" | "base64url" = "base64url",
+	to: "base64" | "base64url" | "hex" | "ascii" = "base64url",
 ): string {
+	if (to === "ascii") return arrayBufferToString(buffer.buffer);
+	if (to === "hex") return arrayBufferToHexString(buffer);
 	return base64.fromArrayBuffer(buffer, to === "base64url");
 }
 
@@ -67,4 +69,20 @@ export function isBase64url(input: string): boolean {
 	// Trim padding characters from the string if present
 	input = input.replace(/=/g, "");
 	return base64.validate(input, true);
+}
+
+/**
+ * helper to convert an ArrayBuffer to a hex string
+ */
+function arrayBufferToHexString(buffer: ArrayBuffer) {
+	return [...new Uint8Array(buffer)]
+		.map((x) => x.toString(16).padStart(2, "0"))
+		.join("");
+}
+
+/**
+ * helper to convert an ArrayBuffer to a string
+ */
+function arrayBufferToString(buffer: ArrayBuffer) {
+	return String.fromCharCode(...new Uint8Array(buffer));
 }

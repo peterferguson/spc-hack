@@ -1,11 +1,11 @@
 ---
-import "../../public/global.css";
 import { UsernameForm } from "../components/forms/username";
 ---
 
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<link rel="stylesheet" href="/global.css" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
@@ -19,12 +19,18 @@ import { UsernameForm } from "../components/forms/username";
 				if (pageInIframe()) {
 					document.getElementById("heading")!.innerText =
 						"SPC Wallet (in iframe)";
+				} else {
+					const credId = window.localStorage.get("credId");
+					const credentialIdElement = document.getElementById("credential-id");
+
+					if (credentialIdElement) credentialIdElement.innerText = credId;
 				}
 			}
 		</script>
 	</head>
 	<body class="flex flex-col items-center justify-center h-screen">
 		<h1 id="heading">SPC Wallet</h1>
+		<strong id="credential-id"></strong>
 
 		<UsernameForm client:only />
 	</body>

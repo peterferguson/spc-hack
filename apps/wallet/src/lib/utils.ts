@@ -1,4 +1,10 @@
-import { toBase64UrlString, toBuffer } from "./base64url";
+import {
+	toBase64UrlString,
+	toBuffer,
+	fromBuffer,
+	getDappOrigin,
+	getWalletOrigin,
+} from "helpers";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -6,24 +12,11 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export const getDappOrigin = () => {
-	const isDev = import.meta.env.DEV;
-	const domain = isDev ? "loca.lt" : "web.app";
-	const origin = `https://spc-dapp.${domain}`;
-
-	return origin;
-};
-
-export const getWalletOrigin = () => {
-	const isDev = import.meta.env.DEV;
-	const domain = isDev ? "loca.lt" : "web.app";
-	const origin = `https://spc-wallet.${domain}`;
-
-	return origin;
-};
-
 export const sendMessage = (message: string) => {
-	window.parent.postMessage({ message }, getDappOrigin());
+	window.parent.postMessage(
+		{ message },
+		getDappOrigin({ isDev: import.meta.env.DEV }),
+	);
 };
 
 export const registerSpcCredential = async ({
@@ -32,7 +25,13 @@ export const registerSpcCredential = async ({
 }: { userId: string; challenge: string }) => {
 	const opts = {
 		challenge: new Uint8Array(),
-		rp: { id: getWalletOrigin().replace("https://", ""), name: "SPC Wallet" },
+		rp: {
+			id: getWalletOrigin({ isDev: import.meta.env.DEV }).replace(
+				"https://",
+				"",
+			),
+			name: "SPC Wallet",
+		},
 		user: {
 			id: new Uint8Array(),
 			name: "jane.doe@example.com",
@@ -96,3 +95,49 @@ export const registerSpcCredential = async ({
 
 	// return await _fetch('/auth/registerResponse', credential);
 };
+
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export function logCreatedCredential(publicKeyCredential: any) {
+	console.log("handleCreatedCredential", publicKeyCredential);
+	const response = publicKeyCredential.response;
+
+	// Access attestationObject ArrayBuffer
+	const attestationObj = response.attestationObject;
+	const attestationObjHex = fromBuffer(attestationObj, "hex");
+
+	// Access client JSON
+	const rawClientDataJSON = response.clientDataJSON;
+
+	const clientDataJSON = JSON.parse(
+		fromBuffer(response.clientDataJSON, "ascii"),
+	);
+
+	// Return authenticator data ArrayBuffer
+	const authenticatorData = response.getAuthenticatorData();
+
+	const authenticatorDataHex = fromBuffer(authenticatorData, "hex");
+
+	// Return public key ArrayBuffer
+	const pk = response.getPublicKey();
+	const pkHex = fromBuffer(pk, "hex");
+
+	// Return public key algorithm identifier
+	const pkAlgo = response.getPublicKeyAlgorithm();
+
+	// Return permissible transports array
+	const transports = response.getTransports();
+
+	console.log("created credential", {
+		credentialId: publicKeyCredential.id,
+		attestationObj,
+		attestationObjHex,
+		rawClientDataJSON,
+		clientDataJSON,
+		authenticatorData,
+		authenticatorDataHex,
+		pk,
+		pkHex,
+		pkAlgo,
+		transports,
+	});
+}

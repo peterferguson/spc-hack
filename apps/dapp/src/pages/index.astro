@@ -1,7 +1,5 @@
 ---
-import "../../public/global.css";
-
-import { Button } from "@/components/ui/button";
+import { CreatePaymentButton } from "@/components/create-payment-button";
 import { getPaymentOrigin } from "@/lib/utils";
 
 const paymentOrigin = getPaymentOrigin();
@@ -11,31 +9,38 @@ const paymentOrigin = getPaymentOrigin();
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="stylesheet" href="/global.css" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>SPC dApp</title>
 	</head>
 	<body class="flex flex-col items-center justify-center h-screen">
 		<main class="flex flex-col items-center justify-evenly min-h-[20vh]">
-			<form
+			<!-- <form
 				id="form"
 				action={`${paymentOrigin}/`}
 				class="center"
 				target="iframe"
 				method="post"
-			>
-				<h1>SPC dApp</h1>
+			> -->
+			<h1>SPC dApp</h1>
 
-				<div id="iframe-container" class="hidden">
-					<iframe name="iframe" allow={`payment ${paymentOrigin}`}></iframe>
-				</div>
+			<div id="iframe-container" class="hidden">
+				<iframe name="iframe" allow={`payment ${paymentOrigin}`}></iframe>
+			</div>
 
-				<Button>Create Payment</Button>
-			</form>
+			<CreatePaymentButton client:only />
+			<!-- </form> -->
 		</main>
-		<script type="module">
+		<script>
 			import { getPaymentOrigin } from "../lib/utils";
 			const paymentOrigin = getPaymentOrigin();
+
+			console.log(
+				"setting up message listeners for paymentOrigin: ",
+				paymentOrigin,
+			);
+
 			window.addEventListener("message", (e) => {
 				if (e.origin !== paymentOrigin) {
 					return;

@@ -2,15 +2,14 @@
 	"name": "helpers",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
+	"main": "index.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
 	"author": "",
-	"license": "ISC",
 	"dependencies": {
 		"@simplewebauthn/server": "^9.0.3",
-		"base64url": "^3.0.1"
+		"@hexagon/base64": "^1.1.28"
 	}
 }
