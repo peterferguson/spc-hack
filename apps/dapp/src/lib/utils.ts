@@ -2,9 +2,9 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import {
 	defaultInstrument,
+	fromBuffer,
 	getDappOrigin,
 	getWalletOrigin,
-	toBase64UrlString,
 	toBuffer,
 } from "helpers";
 
@@ -88,29 +88,20 @@ export const payWithSPC = async (
 		// response.details is a PublicKeyCredential, with a clientDataJSON that
 		// contains the transaction data for verification by the issuing bank.
 		const cred = response.details;
-		const credential = {
+
+		// TODO: send the wallet the response for verification before executing the payment
+		const serialisableCredential = {
 			id: cred.id,
 			type: cred.type,
 			// credential.rawId = base64url.encode(cred.rawId);
+			response: {
+				clientDataJSON: fromBuffer(cred.response.clientDataJSON),
+				authenticatorData: fromBuffer(cred.response.authenticatorData),
+				signature: fromBuffer(cred.response.signature),
+				userHandle: fromBuffer(cred.response.userHandle),
+			},
 		};
 
-		if (cred.response) {
-			const clientDataJSON = toBase64UrlString(cred.response.clientDataJSON);
-			const authenticatorData = toBase64UrlString(
-				cred.response.authenticatorData,
-			);
-			const signature = toBase64UrlString(cred.response.signature);
-			const userHandle = toBase64UrlString(cred.response.userHandle);
-			// @ts-ignore
-			credential.response = {
-				clientDataJSON,
-				authenticatorData,
-				signature,
-				userHandle,
-			};
-		}
-
-		// TODO: verify the response with the wallet
 		await response.complete("success");
 
 		/* send response.details to the issuing bank for verification */
