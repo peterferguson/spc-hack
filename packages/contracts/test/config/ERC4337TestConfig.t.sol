@@ -85,16 +85,6 @@ contract ERC4337TestConfig {
         userOp.accountGasLimits = packHigh128(VERIFICATION_GAS_LIMIT) | packLow128(CALL_GAS_LIMIT);
     }
 
-    // // Build payload which the entryPoint will call on the sender 4337 account
-    // function buildExecutionPayload(
-    //     address to,
-    //     uint256 value,
-    //     bytes memory data,
-    //     Enum.Operation operation
-    // ) internal pure returns (bytes memory) {
-    //     return abi.encodeWithSignature("executeAndRevert(address,uint256,bytes,uint8)", to, value, data, operation);
-    // }
-
     // // Calculate gas used by sender of userOp
     // // ! currently only works when paymaster set to 0 - hence 'address(0) != address(0)'
     // function calculateGas(UserOperation memory userOp) internal pure returns (uint256) {
