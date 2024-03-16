@@ -1,8 +1,9 @@
 import { encodeFunctionData } from "viem"
-import { bundlerClient, paymasterClient, smartAccountClient } from './permissionless'
-
+import { walletClient, publicClient } from './permissionless'
 
 // abis --------------------------------------------
+
+const ONIT_FACTORY_ADDRESS = '0x42ab880ea77fc7a09eb6ba0fe82fbc9901c114b6'
 
 const createSafe4337Abi = [
     { "type": "function", "name": "createSafe4337", "inputs": [{ "name": "passkeyPublicKey", "type": "uint256[2]", "internalType": "uint256[2]" }, { "name": "nonce", "type": "uint256", "internalType": "uint256" }], "outputs": [{ "name": "onitAccountAddress", "type": "address", "internalType": "address" }], "stateMutability": "nonpayable" }
@@ -11,31 +12,19 @@ const createSafe4337Abi = [
 // formatting calls --------------------------------------------
 
 export const createSafe4337Account = async () => {
-    const userOperation = await smartAccountClient.prepareUserOperationRequest({
-        userOperation: {
-            callData: formatFactoryCreateSafe4337Calldata(1n, 2n, 3n),
-            callGasLimit: 10000000n,
-            verificationGasLimit: 10000000n,
-            preVerificationGas: 10000000n,
-
-        }
+    const { request } = await publicClient.simulateContract({
+        account: walletClient.account,
+        address: ONIT_FACTORY_ADDRESS,
+        abi: createSafe4337Abi,
+        functionName: 'createSafe4337',
+        args: [[1n, 2n], 3n],
     })
-    console.log({ userOperation })
+    console.log({ request })
 
-    // const gas = await bundlerClient.estimateUserOperationGas({
-    //     userOperation: userOperation
-    // })
+    const deployResponse = await walletClient.writeContract(request)
+    console.log({ deployResponse })
 
-    // console.log({ gas })
-
-    const r = await paymasterClient.sponsorUserOperation({
-        userOperation: userOperation,
-        sponsorshipPolicyId: 'sp_volatile_quasimodo'
-        // entryPoint: ENTRYPOINT_ADDRESS_V07
-    })
-    console.log({ r })
-
-    return r
+    return deployResponse
 }
 
 const formatFactoryCreateSafe4337Calldata = (x: bigint, y: bigint, nonce: bigint) => {

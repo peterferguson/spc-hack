@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { createSafe4337Account } from "@/lib/permissionless";
+import { createSafe4337Account } from "@/lib/safe-account";
 
 export function DeployAccountButton() {
 	return (
