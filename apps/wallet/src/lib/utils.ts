@@ -64,14 +64,18 @@ const defaultSpcOpts = {
 >;
 
 export const registerSpcCredential = async ({
-	userId,
+	username,
 	challenge,
-}: { userId: string; challenge: string }) => {
+}: { username: string; challenge: string }) => {
 	const publicKey = { ...defaultSpcOpts };
+	const usernameHash = await crypto.subtle.digest(
+		"SHA-256",
+		new TextEncoder().encode(username),
+	);
 
-	publicKey.user.displayName = userId;
-	publicKey.user.name = userId;
-	publicKey.user.id = toBuffer(userId);
+	publicKey.user.name = username;
+	publicKey.user.displayName = username;
+	publicKey.user.id = new Uint8Array(usernameHash);
 	publicKey.challenge = toBuffer(challenge);
 
 	const cred = (await navigator.credentials.create({
@@ -109,7 +113,7 @@ export const registerSpcCredential = async ({
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({
-			username: userId,
+			username,
 			credentialId: cred.id,
 			publicKey: serialisableCredential.response.publicKey,
 			dappName: document.referrer,

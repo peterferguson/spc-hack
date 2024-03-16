@@ -1,6 +1,10 @@
 ---
 import "../../public/global.css";
 import { CreatePaymentButton } from "@/components/create-payment-button";
+import { DeployAccountButton } from "@/components/deploy-account-button";
+import { getPaymentOrigin } from "@/lib/utils";
+
+const paymentOrigin = getPaymentOrigin();
 import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 ---
 
@@ -17,16 +21,53 @@ import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 		<main class="flex flex-col items-center justify-evenly min-h-[20vh]">
 			<h1>SPC dApp</h1>
 
+			<div id="iframe-container" class="hidden">
+				<iframe name="iframe" allow={`payment ${paymentOrigin}`}
+				></iframe>
+			</div>
+
+			<CreatePaymentButton client:only />
+			<DeployAccountButton client:only />
+			<!-- </form> -->
 			<WalletIframeDialog />
 			<CreatePaymentButton client:only />
 		</main>
 		<script>
-			import { getPaymentOrigin } from "../lib/utils";
+			import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
+			import {
+				getPaymentOrigin,
+				payWithSPC,
+				getPaymentDetails,
+			} from "../lib/utils";
 			const paymentOrigin = getPaymentOrigin();
 
-			window.addEventListener("message", (e) => {
+			window.addEventListener("message", async (e) => {
 				if (e.origin !== paymentOrigin) return;
-				if (e.data.paid !== undefined) return; // TODO: recieve confirmation of payment & display feedback
+				if (e.data.type === "paid") return; // TODO: recieve confirmation of payment & display feedback
+				if (e.data.type === "credentials.found") {
+					console.log("Credentials found", e.data);
+
+					// - the wallet has found credentials for the username that was entered into the iframe by the user
+					// - so we close the iframe and create a payment
+					const iframeDialog = document.getElementById(
+						WALLET_IFRAME_DIALOG_ID,
+					) as HTMLDialogElement | null;
+
+					iframeDialog?.close();
+					iframeDialog?.removeAttribute("open");
+					iframeDialog?.classList.add("hidden");
+
+					// - resubmit the button click event to create the payment
+					await payWithSPC(
+						{
+							allowedCredentials: [e.data.credentialId],
+							challenge: "challenge",
+							timeout: 60000,
+						},
+						getPaymentDetails("1.00"),
+						"0x123...456",
+					);
+				}
 			});
 		</script>
 	</body>

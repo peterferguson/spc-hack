@@ -31,6 +31,28 @@ type SerialisableCredentialRequestOptions = Omit<
 	allowedCredentials: string[];
 };
 
+export const getPaymentDetails = (amount: string) => ({
+	// - the SPC spec allows for multiple items to be displayed
+	// - but currently the Chrome implementation does NOT display ANY items
+	displayItems: [
+		{
+			label: "NFT",
+			amount: { currency: "USD", value: "0.0000001" },
+			pending: true,
+		},
+		{
+			label: "Gas Fee",
+			amount: { currency: "USD", value: "0.0000001" },
+			pending: true,
+		},
+	],
+	total: {
+		label: "Total",
+		// - currency must be a ISO 4217 currency code
+		amount: { currency: "USD", value: amount },
+	},
+});
+
 export const payWithSPC = async (
 	requestOptions: SerialisableCredentialRequestOptions,
 	paymentDetails: PaymentDetailsInit,
@@ -39,9 +61,16 @@ export const payWithSPC = async (
 	const { challenge, timeout } = requestOptions;
 
 	// - convert the allowed credential ids to a buffer
-	const credentialIds = requestOptions.allowedCredentials.map((credentialId) =>
-		toBuffer(credentialId),
-	);
+	const credentialIds = requestOptions.allowedCredentials
+		.map((credentialId) => {
+			const credential = toBuffer(credentialId);
+
+			// - verify credentialId is reasonable
+			if (credential.byteLength > 32) return undefined;
+
+			return credential;
+		})
+		.filter(Boolean);
 
 	const paymentMethodData = [
 		{
@@ -60,7 +89,7 @@ export const payWithSPC = async (
 				// A display name and an icon that represent the payment instrument.
 				instrument: {
 					...defaultInstrument,
-					displayName: `Wallet Address - ${address}`,
+					displayName: `Sent From Wallet - ${address}`,
 				},
 
 				// The origin of the payee
