@@ -1,0 +1,32 @@
+---
+import { cn } from "@/lib/utils";
+import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
+import { getPaymentOrigin } from "@/lib/utils";
+
+const paymentOrigin = getPaymentOrigin();
+---
+
+<dialog
+	id={WALLET_IFRAME_DIALOG_ID}
+	class={cn(
+		"items-center justify-center",
+		"border rounded-lg py-3 px-4 min-h-[40vh]",
+		"backdrop:bg-black backdrop:opacity-50 backdrop:backdrop-blur-md",
+		"backdrop:transition-opacity backdrop:duration-300",
+	)}
+>
+	<iframe class="h-full w-full" name="iframe" allow={`payment ${paymentOrigin}`}
+	></iframe>
+</dialog>
+<script>
+	import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
+	import { getPaymentOrigin } from "@/lib/utils";
+	const iframeDialog = document.getElementById(
+		WALLET_IFRAME_DIALOG_ID,
+	) as HTMLDialogElement | null;
+
+	const iframe = iframeDialog.querySelector("iframe");
+
+	iframe.src = getPaymentOrigin();
+	iframeDialog.addEventListener("click", () => dialog.close());
+</script>

@@ -12,10 +12,24 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export const sendMessage = (message: string) => {
+export const getPayeeOrigin = () =>
+	getDappOrigin({ isDev: import.meta.env.DEV });
+
+export const getPaymentOrigin = () =>
+	getWalletOrigin({ isDev: import.meta.env.DEV });
+
+export function pageInIframe() {
+	return window.location !== window.parent.location;
+}
+
+/**
+ * Utility function to send a message to the parent window
+ * @param message message to send to the parent window
+ */
+export const sendMessage = (message: string | Record<string, unknown>) => {
 	window.parent.postMessage(
-		{ message },
-		getDappOrigin({ isDev: import.meta.env.DEV }),
+		typeof message === "string" ? { message } : message,
+		getPayeeOrigin(),
 	);
 };
 

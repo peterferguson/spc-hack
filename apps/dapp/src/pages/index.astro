@@ -1,8 +1,7 @@
 ---
+import "../../public/global.css";
 import { CreatePaymentButton } from "@/components/create-payment-button";
-import { getPaymentOrigin } from "@/lib/utils";
-
-const paymentOrigin = getPaymentOrigin();
+import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 ---
 
 <html lang="en">
@@ -16,30 +15,14 @@ const paymentOrigin = getPaymentOrigin();
 	</head>
 	<body class="flex flex-col items-center justify-center h-screen">
 		<main class="flex flex-col items-center justify-evenly min-h-[20vh]">
-			<!-- <form
-				id="form"
-				action={`${paymentOrigin}/`}
-				class="center"
-				target="iframe"
-				method="post"
-			> -->
 			<h1>SPC dApp</h1>
 
-			<div id="iframe-container" class="hidden">
-				<iframe name="iframe" allow={`payment ${paymentOrigin}`}></iframe>
-			</div>
-
+			<WalletIframeDialog />
 			<CreatePaymentButton client:only />
-			<!-- </form> -->
 		</main>
 		<script>
 			import { getPaymentOrigin } from "../lib/utils";
 			const paymentOrigin = getPaymentOrigin();
-
-			console.log(
-				"setting up message listeners for paymentOrigin: ",
-				paymentOrigin,
-			);
 
 			window.addEventListener("message", (e) => {
 				if (e.origin !== paymentOrigin) {
