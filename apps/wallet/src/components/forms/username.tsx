@@ -23,19 +23,10 @@ const formSchema = z.object({
 export function UsernameForm() {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
-		defaultValues: {
-			username: "",
-		},
+		defaultValues: { username: "" },
 	});
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
-		console.log({
-			...values,
-			credentials: [],
-		});
-
 		await registerSpcCredential({
 			userId: values.username,
 			challenge: "challenge",

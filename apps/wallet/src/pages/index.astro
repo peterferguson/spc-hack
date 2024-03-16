@@ -1,4 +1,5 @@
 ---
+import "../../public/global.css";
 import { UsernameForm } from "../components/forms/username";
 ---
 
@@ -11,21 +12,10 @@ import { UsernameForm } from "../components/forms/username";
 		<meta name="generator" content={Astro.generator} />
 		<title>SPC Wallet</title>
 		<script>
-			{
-				function pageInIframe() {
-					return window.location !== window.parent.location;
-				}
+			import { pageInIframe } from "@/lib/utils";
 
-				if (pageInIframe()) {
-					document.getElementById("heading")!.innerText =
-						"SPC Wallet (in iframe)";
-				} else {
-					const credId = window.localStorage.get("credId");
-					const credentialIdElement = document.getElementById("credential-id");
-
-					if (credentialIdElement) credentialIdElement.innerText = credId;
-				}
-			}
+			if (pageInIframe())
+				document.getElementById("heading")!.style.display = "none";
 		</script>
 	</head>
 	<body class="flex flex-col items-center justify-center h-screen">
@@ -34,4 +24,30 @@ import { UsernameForm } from "../components/forms/username";
 
 		<UsernameForm client:only />
 	</body>
+	<script>
+		import { pageInIframe, getPayeeOrigin, sendMessage } from "@/lib/utils";
+
+		if (pageInIframe()) {
+			window.addEventListener("message", (e) => {
+				if (e.origin !== getPayeeOrigin()) return;
+
+				if (e.data.type === "credentials.get") {
+					const credential = localStorage.getItem("credId");
+					sendMessage({
+						type: "credentials.get",
+						credentials: credential ? [credential] : [],
+					});
+				}
+
+				if (e.data.paid !== undefined) {
+					alert(
+						`Payment ${e.data.paid ? "succeeded" : "failed"}. Credential ${e.data.registered ? "registered" : "not registered"}`,
+					);
+					location.href = "/success";
+				} else {
+					console.log("recieved message", e.data.message);
+				}
+			});
+		}
+	</script>
 </html>

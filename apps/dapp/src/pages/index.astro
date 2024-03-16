@@ -1,9 +1,11 @@
 ---
+import "../../public/global.css";
 import { CreatePaymentButton } from "@/components/create-payment-button";
 import { DeployAccountButton } from "@/components/deploy-account-button";
 import { getPaymentOrigin } from "@/lib/utils";
 
 const paymentOrigin = getPaymentOrigin();
+import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 ---
 
 <html lang="en">
@@ -17,13 +19,6 @@ const paymentOrigin = getPaymentOrigin();
 	</head>
 	<body class="flex flex-col items-center justify-center h-screen">
 		<main class="flex flex-col items-center justify-evenly min-h-[20vh]">
-			<!-- <form
-				id="form"
-				action={`${paymentOrigin}/`}
-				class="center"
-				target="iframe"
-				method="post"
-			> -->
 			<h1>SPC dApp</h1>
 
 			<div id="iframe-container" class="hidden">
@@ -34,28 +29,16 @@ const paymentOrigin = getPaymentOrigin();
 			<CreatePaymentButton client:only />
 			<DeployAccountButton client:only />
 			<!-- </form> -->
+			<WalletIframeDialog />
+			<CreatePaymentButton client:only />
 		</main>
 		<script>
 			import { getPaymentOrigin } from "../lib/utils";
 			const paymentOrigin = getPaymentOrigin();
 
-			console.log(
-				"setting up message listeners for paymentOrigin: ",
-				paymentOrigin,
-			);
-
 			window.addEventListener("message", (e) => {
-				if (e.origin !== paymentOrigin) {
-					return;
-				}
-				if (e.data.paid !== undefined) {
-					alert(
-						`Payment ${e.data.paid ? "succeeded" : "failed"}. Credential ${e.data.registered ? "registered" : "not registered"}`,
-					);
-					location.href = "/success";
-				} else {
-					console.log("recieved message", e.data.message);
-				}
+				if (e.origin !== paymentOrigin) return;
+				if (e.data.paid !== undefined) return; // TODO: recieve confirmation of payment & display feedback
 			});
 		</script>
 	</body>
