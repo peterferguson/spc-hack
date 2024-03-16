@@ -32,20 +32,12 @@ import { UsernameForm } from "../components/forms/username";
 				if (e.origin !== getPayeeOrigin()) return;
 
 				if (e.data.type === "credentials.get") {
-					const credential = localStorage.getItem("credId");
+					let credential = localStorage.getItem("credId");
+
 					sendMessage({
 						type: "credentials.get",
 						credentials: credential ? [credential] : [],
 					});
-				}
-
-				if (e.data.paid !== undefined) {
-					alert(
-						`Payment ${e.data.paid ? "succeeded" : "failed"}. Credential ${e.data.registered ? "registered" : "not registered"}`,
-					);
-					location.href = "/success";
-				} else {
-					console.log("recieved message", e.data.message);
 				}
 			});
 		}

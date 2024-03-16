@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { registerSpcCredential } from "@/lib/utils";
+import { registerSpcCredential, sendMessage } from "@/lib/utils";
 
 const formSchema = z.object({
 	username: z.string().min(2, {
@@ -26,9 +26,20 @@ export function UsernameForm() {
 		defaultValues: { username: "" },
 	});
 
-	async function onSubmit(values: z.infer<typeof formSchema>) {
+	async function onSubmit({ username }: z.infer<typeof formSchema>) {
+		if (!username) {
+			const credentialId = await fetch(`/auth/credentials?username=${username}`)
+				.then((res) => res.text())
+				.catch(console.error);
+			if (credentialId) {
+				localStorage.setItem("credId", credentialId);
+				sendMessage({ type: "credential.found", payload: { credentialId } });
+				return;
+			}
+		}
+
 		await registerSpcCredential({
-			userId: values.username,
+			username,
 			challenge: "challenge",
 		});
 	}
