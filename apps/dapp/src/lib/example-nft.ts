@@ -12,15 +12,12 @@ const EXAMPLE_NFT_ABI = [
 
 // nft calls --------------------------------------------
 
-export const getNftUri = async (tokenId: bigint) => {
-    const data = await publicClient.readContract({
-        address: NFT_ADDRESS,
-        abi: EXAMPLE_NFT_ABI,
-        functionName: 'uri',
-        args: [tokenId],
-    })
-    console.log({ data })
+export const getNftUri = async (tokenId: bigint) => await publicClient.readContract({
+    address: NFT_ADDRESS,
+    abi: EXAMPLE_NFT_ABI,
+    functionName: 'uri',
+    args: [tokenId],
+})
 
-    return data
-}
+
 
