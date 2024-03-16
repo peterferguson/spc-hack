@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { registerSpcCredential } from "@/lib/utils";
 
 const formSchema = z.object({
 	username: z.string().min(2, {
@@ -27,12 +28,17 @@ export function UsernameForm() {
 		},
 	});
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
+	async function onSubmit(values: z.infer<typeof formSchema>) {
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
 		console.log({
 			...values,
 			credentials: [],
+		});
+
+		await registerSpcCredential({
+			userId: values.username,
+			challenge: "challenge",
 		});
 	}
 

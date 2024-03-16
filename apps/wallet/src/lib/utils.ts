@@ -1,68 +1,98 @@
+import { toBase64UrlString, toBuffer } from "./base64url";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import base64url from "base64url";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export const getPayeeDomain = () => {
+export const getDappOrigin = () => {
 	const isDev = import.meta.env.DEV;
 	const domain = isDev ? "loca.lt" : "web.app";
-	const payeeOrigin = `https://spc-dapp.${domain}`;
+	const origin = `https://spc-dapp.${domain}`;
 
-	return payeeOrigin;
+	return origin;
+};
+
+export const getWalletOrigin = () => {
+	const isDev = import.meta.env.DEV;
+	const domain = isDev ? "loca.lt" : "web.app";
+	const origin = `https://spc-wallet.${domain}`;
+
+	return origin;
 };
 
 export const sendMessage = (message: string) => {
-	window.parent.postMessage({ message }, getPayeeDomain());
+	window.parent.postMessage({ message }, getDappOrigin());
 };
 
+export const registerSpcCredential = async ({
+	userId,
+	challenge,
+}: { userId: string; challenge: string }) => {
+	const opts = {
+		challenge: new Uint8Array(),
+		rp: { id: getWalletOrigin().replace("https://", ""), name: "SPC Wallet" },
+		user: {
+			id: new Uint8Array(),
+			name: "jane.doe@example.com",
+			displayName: "Jane Doe",
+		},
+		pubKeyCredParams: [
+			{
+				type: "public-key",
+				alg: -7, // "ES256"
+			},
+		],
+		authenticatorSelection: {
+			userVerification: "required",
+			residentKey: "required",
+			authenticatorAttachment: "platform",
+		},
+		timeout: 360000, // 6 minutes
 
-export const registerSpcCredential = async ({ userId, challenge }: { userId: string, challenge: string }) => {
-  const opts = {
-    attestation: 'none',
-    authenticatorSelection: {
-      authenticatorAttachment: 'platform',
-      userVerification: 'required',
-      residentKey: 'preferred'
-    }
-  } as const satisfies Partial<PublicKeyCredentialCreationOptions>;
+		// Indicate that this is an SPC credential. This is currently required to
+		// allow credential creation in an iframe, and so that the browser knows this
+		// credential relates to SPC.
+		extensions: {
+			payment: {
+				isPayment: true,
+			},
+		},
+		attestation: "none",
+	} satisfies Partial<
+		PublicKeyCredentialCreationOptions & {
+			extensions: PublicKeyCredentialCreationOptions["extensions"] & {
+				payment: { isPayment: boolean };
+			};
+		}
+	>;
 
-  // const options = await _fetch('/auth/registerRequest', opts);
-  const publicKey: Partial<PublicKeyCredentialCreationOptions> = opts
+	opts.user.id = toBuffer(userId);
+	opts.challenge = toBuffer(challenge);
 
-  publicKey.user.id = base64url.decode(userId);
-  publicKey.challenge = base64url.decode(challenge);
+	const cred = await navigator.credentials.create({ publicKey: opts });
 
-  if (publicKey.excludeCredentials) {
-    for (let cred of publicKey.excludeCredentials) {
-      cred.id = base64url.decode(cred.id);
-    }
-  }
+	if (!cred) throw new Error("No credential returned");
 
-  const cred = await navigator.credentials.create({ publicKey });
+	const credential = {
+		id: cred.id,
+		// rawId: window.base64url.encode(cred.rawId),
+		type: cred.type,
+	};
 
-  if (!cred) throw new Error('No credential returned');
+	if (cred.response) {
+		const clientDataJSON = toBase64UrlString(cred.response.clientDataJSON);
+		const attestationObject = toBase64UrlString(
+			cred.response.attestationObject,
+		);
+		credential.response = {
+			clientDataJSON,
+			attestationObject,
+		};
+	}
 
-  const credential = {
-    id: cred.id,
-    // rawId: base64url.encode(cred.rawId),
-    type: cred.type,
-  };
+	localStorage.setItem("credId", credential.id);
 
-  if (cred.response) {
-    const clientDataJSON =
-      base64url.encode(cred.response.clientDataJSON);
-    const attestationObject =
-      base64url.encode(cred.response.attestationObject);
-    credential.response = {
-      clientDataJSON,
-      attestationObject,
-    };
-  }
-
-  localStorage.setItem(`credId`, credential.id);
-
-  // return await _fetch('/auth/registerResponse', credential);
+	// return await _fetch('/auth/registerResponse', credential);
 };
