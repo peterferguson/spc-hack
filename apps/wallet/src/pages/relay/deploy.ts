@@ -76,9 +76,25 @@ const relaySafeDeploy = async ({
 		account: privateKeyToAccount(import.meta.env.PRIVATE_KEY),
 	});
 
+	// const { request, result } = await publicClient.simulateContract({
+	// 	account: walletClient.account,
+	// 	address: V6_BUNDLER_ONIT_FACTORY_ADDRESS,
+	// 	abi: createSafe4337Abi,
+	// 	functionName: "createSafe4337",
+	// 	args: [publicKey, 0n],
+	// });
+
+	// const { request, result } = await publicClient.simulateContract({
+	// 	account: walletClient.account,
+	// 	address: V6_BUNDLER_ONIT_FACTORY_ADDRESS,
+	// 	abi: createBasic4337Abi,
+	// 	functionName: "createBasic4337",
+	// 	args: [publicKey, 0n],
+	// });
+
 	const { request, result } = await publicClient.simulateContract({
 		account: walletClient.account,
-		address: ONIT_FACTORY_ADDRESS,
+		address: V7_BUNDLER_SAFE_FACTORY_ADDRESS,
 		abi: createSafe4337Abi,
 		functionName: "createSafe4337",
 		args: [publicKey, 0n],
@@ -91,13 +107,41 @@ const relaySafeDeploy = async ({
 
 // abis --------------------------------------------
 
-const ONIT_FACTORY_ADDRESS =
+const V7_BUNDLER_SAFE_ONIT_FACTORY_ADDRESS =
 	"0x42ab880ea77fc7a09eb6ba0fe82fbc9901c114b6" as const;
+
+const V6_BUNDLER_SAFE_ONIT_FACTORY_ADDRESS =
+	"0xa4025cc96a042a4522F9115478D4d527F954a40E" as const;
+
+const V6_BUNDLER_ONIT_FACTORY_ADDRESS =
+	"0x70b3b72f7737c017888d64e60c5bfee6ca226b85" as const;
+
+const V7_BUNDLER_SAFE_FACTORY_ADDRESS =
+	"0x758f1ce181e74b4eb3d38441a0b2b117991c5cc8" as const;
 
 const createSafe4337Abi = [
 	{
 		type: "function",
 		name: "createSafe4337",
+		inputs: [
+			{
+				name: "passkeyPublicKey",
+				type: "uint256[2]",
+				internalType: "uint256[2]",
+			},
+			{ name: "nonce", type: "uint256", internalType: "uint256" },
+		],
+		outputs: [
+			{ name: "onitAccountAddress", type: "address", internalType: "address" },
+		],
+		stateMutability: "nonpayable",
+	},
+] as const;
+
+const createBasic4337Abi = [
+	{
+		type: "function",
+		name: "createBasic4337",
 		inputs: [
 			{
 				name: "passkeyPublicKey",

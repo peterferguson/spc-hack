@@ -72,7 +72,7 @@ export const payWithSPC = async (
 	try {
 		response = await request.show();
 
-		console.log("spc response", response);
+		console.log("spc response", response, response.details);
 
 		// response.details is a PublicKeyCredential, with a clientDataJSON that
 		// contains the transaction data for verification by the issuing bank.
@@ -86,7 +86,7 @@ export const payWithSPC = async (
 			response: {
 				clientDataJSON: fromBuffer(cred.response.clientDataJSON),
 				authenticatorData: fromBuffer(cred.response.authenticatorData),
-				signature: fromBuffer(cred.response.signature),
+				signature: fromBuffer(cred.response.signature, "hex"),
 				userHandle: fromBuffer(cred.response.userHandle),
 			},
 		};
@@ -94,6 +94,7 @@ export const payWithSPC = async (
 		await response.complete("success");
 
 		/* send response.details to the issuing bank for verification */
+		return serialisableCredential;
 	} catch (err) {
 		await response.complete("fail");
 		/* SPC cannot be used; merchant should fallback to traditional flows */
