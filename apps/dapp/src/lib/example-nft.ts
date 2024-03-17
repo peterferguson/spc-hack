@@ -24,7 +24,7 @@ export const getNftUri = async (tokenId: bigint) => await publicClient.readContr
     args: [tokenId],
 })
 
-export const getBalance = async (address: Address, tokenId: bigint) => {
+export const getBalance = async (address: Address | undefined, tokenId: bigint) => {
     if (!address) return 0
     const results = await publicClient.readContract(
         {
