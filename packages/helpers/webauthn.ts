@@ -42,5 +42,8 @@ export const getXandY = async (pk: CryptoKey) => {
 
 	const yBuffer = toBuffer(jwkKey.y, "base64");
 
-	return { x: fromBuffer(xBuffer, "hex"), y: fromBuffer(yBuffer, "hex") };
+	return {
+		x: `0x${fromBuffer(xBuffer, "hex")}`,
+		y: `0x${fromBuffer(yBuffer, "hex")}`,
+	};
 };
