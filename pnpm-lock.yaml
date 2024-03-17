@@ -62,6 +62,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      spc-lib:
+        specifier: workspace:*
+        version: link:../../packages/spc-lib
       tailwind-merge:
         specifier: ^2.2.1
         version: 2.2.1
@@ -173,6 +176,15 @@ importers:
       '@simplewebauthn/server':
         specifier: ^9.0.3
         version: 9.0.3
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+
+  packages/spc-lib:
+    dependencies:
+      helpers:
+        specifier: workspace:*
+        version: link:../helpers
       zod:
         specifier: ^3.22.4
         version: 3.22.4
