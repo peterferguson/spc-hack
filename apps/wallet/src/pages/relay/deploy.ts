@@ -19,7 +19,7 @@ export const POST: APIRoute = async (ctx) => {
 			await ctx.request.json(),
 		);
 
-		if (!username || !publicKey)
+		if (!username && !publicKey)
 			return new Response("Invalid input", { status: 400 });
 
 		const [credential] =
