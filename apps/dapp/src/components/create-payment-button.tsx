@@ -1,10 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { formatMintCouponToModuleExecutionCalldata } from "@/lib/example-nft";
-import {
-	bundlerClient,
-	paymasterClient,
-	publicClient,
-} from "@/lib/permissionless";
+import { bundlerClient, publicClient } from "@/lib/permissionless";
 import { getPayeeOrigin, getPaymentOrigin } from "@/lib/utils";
 import {
 	ENTRYPOINT_ADDRESS_V07,
@@ -50,7 +46,7 @@ export function CreatePaymentButton() {
 						timeout: 60000,
 					},
 					getPayeeOrigin(),
-					getPaymentDetails("0.0000001"),
+					getPaymentDetails("0.00"),
 					address,
 				);
 
@@ -62,7 +58,7 @@ export function CreatePaymentButton() {
 				});
 			}}
 		>
-			Create Payment
+			Claim Coupon
 		</Button>
 	);
 }
