@@ -5,6 +5,8 @@ import {BaseAccount, IEntryPoint} from "../../lib/account-abstraction/contracts/
 import {PackedUserOperation} from "../../lib/account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 import {HandlerContext} from "../../lib/safe-smart-account/contracts/handler/HandlerContext.sol";
 import {WebAuthn} from "../../lib/webauthn-sol/src/WebAuthn.sol";
+import {CompatibilityFallbackHandler} from
+    "../../lib/safe-smart-account/contracts/handler/CompatibilityFallbackHandler.sol";
 
 import {ISafe} from "../interfaces/ISafe.sol";
 
@@ -21,7 +23,7 @@ import "forge-std/console.sol";
 /**
  * TODO
  */
-contract Safe4337Module is BaseAccount, HandlerContext {
+contract Safe4337Module is BaseAccount, HandlerContext, CompatibilityFallbackHandler {
     /// ----------------------------------------------------------------------------------------
     ///							ACCOUNT STORAGE
     /// ----------------------------------------------------------------------------------------
