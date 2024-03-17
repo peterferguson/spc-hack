@@ -38,10 +38,30 @@ export function UsernameForm() {
 			}
 		}
 
-		await registerSpcCredential({
+		const registrationResponse = await registerSpcCredential({
 			username,
 			challenge: "challenge",
 		});
+
+		if (!registrationResponse.ok) {
+			console.error("Failed to register credential", registrationResponse);
+			return;
+		}
+
+		// TODO: @jamesmccomish please add a description for this route handler ... why we need to deploy from a relay instead of
+		// TODO: using init code
+		const deployResponse = await fetch("/relay/deploy", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username }),
+		});
+
+		const { txHash, address } = (await deployResponse.json()) ?? {};
+
+		console.log("deployResponse", { txHash, address });
+
+		if (txHash) localStorage.setItem("deployTxHash", txHash);
+		if (address) localStorage.setItem("address", address);
 	}
 
 	return (

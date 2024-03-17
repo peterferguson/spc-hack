@@ -1,7 +1,6 @@
 ---
 import "../../public/global.css";
 import { CreatePaymentButton } from "@/components/create-payment-button";
-import { DeployAccountButton } from "@/components/deploy-account-button";
 import { NftImageCard } from "@/components/nft-image-card";
 
 import { getPaymentOrigin } from "@/lib/utils";
@@ -34,9 +33,6 @@ import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 				<main
 					class="flex flex-col items-center justify-evenly min-h-[20vh] bg-green-300"
 				>
-					<CreatePaymentButton client:only />
-					<DeployAccountButton client:only />
-					<!-- </form> -->
 					<WalletIframeDialog />
 					<CreatePaymentButton client:only />
 				</main>

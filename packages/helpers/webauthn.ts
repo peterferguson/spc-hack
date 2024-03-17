@@ -34,7 +34,7 @@ export const importPublicKeyAsCryptoKey = async (
 };
 
 export const getXandY = async (pk: CryptoKey) => {
-	const jwkKey = await window.crypto.subtle.exportKey("jwk", pk);
+	const jwkKey = await crypto.subtle.exportKey("jwk", pk);
 
 	if (!jwkKey.x || !jwkKey.y) throw new Error("No x and y in jwkKey");
 
@@ -42,5 +42,8 @@ export const getXandY = async (pk: CryptoKey) => {
 
 	const yBuffer = toBuffer(jwkKey.y, "base64");
 
-	return { x: fromBuffer(xBuffer, "hex"), y: fromBuffer(yBuffer, "hex") };
+	return {
+		x: `0x${fromBuffer(xBuffer, "hex")}`,
+		y: `0x${fromBuffer(yBuffer, "hex")}`,
+	};
 };
