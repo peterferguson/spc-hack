@@ -1,12 +1,10 @@
 ---
 import "../../public/global.css";
-import { CreatePaymentButton } from "@/components/create-payment-button";
 import { NftImageCard } from "@/components/nft-image-card";
-
 import { getPaymentOrigin } from "@/lib/utils";
+import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 
 const paymentOrigin = getPaymentOrigin();
-import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 ---
 
 <html lang="en">
@@ -18,63 +16,60 @@ import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 		<meta name="generator" content={Astro.generator} />
 		<title>SPC dApp</title>
 	</head>
-	<body class="flex flex-col items-center justify-center h-screen">
-		<main class="flex flex-col items-center justify-evenly min-h-[20vh]">
-			<h1>SPC dApp</h1>
-
+	<body
+		class="flex flex-col items-center justify-center h-screen bg-gradient-to-t from-[#0051ff5c] to-[#0052ff]"
+	>
+		<h1 class="text-5xl font-bold text-white">SPC dApp</h1>
+		<main class="flex flex-col items-center justify-evenly min-h-[60vh]">
 			<div id="iframe-container" class="hidden">
-				<iframe name="iframe" allow={`payment ${paymentOrigin}`}
-				></iframe>
+				<iframe name="iframe" allow={`payment ${paymentOrigin}`}></iframe>
 			</div>
 
-			<main
-				class="flex flex-row items-center justify-between min-h-[20vh] bg-red-300"
-			>
-				<main
-					class="flex flex-col items-center justify-evenly min-h-[20vh] bg-green-300"
-				>
-					<WalletIframeDialog />
-					<CreatePaymentButton client:only />
-				</main>
+			<main class="flex flex-row items-center justify-between min-h-[20vh]">
+				<WalletIframeDialog />
+				<!-- <CreatePaymentButton client:only /> -->
 				<NftImageCard client:only />
 			</main>
 		</main>
 		<script>
-			import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
-			import {
-				getPaymentOrigin,
-				payWithSPC,
-				getPaymentDetails,
-			} from "../lib/utils";
+			// import {
+			// 	WALLET_IFRAME_DIALOG_ID,
+			// 	payWithSPC,
+			// 	getPaymentDetails,
+			// } from "spc-lib";
+			import { getPaymentOrigin, getPayeeOrigin } from "../lib/utils";
+
 			const paymentOrigin = getPaymentOrigin();
 
 			window.addEventListener("message", async (e) => {
 				if (e.origin !== paymentOrigin) return;
 				if (e.data.type === "paid") return; // TODO: recieve confirmation of payment & display feedback
-				if (e.data.type === "credentials.found") {
-					console.log("Credentials found", e.data);
+				// if (e.data.type === "credentials.found") {
+				// 	console.log("Credentials found", e.data);
 
-					// - the wallet has found credentials for the username that was entered into the iframe by the user
-					// - so we close the iframe and create a payment
-					const iframeDialog = document.getElementById(
-						WALLET_IFRAME_DIALOG_ID,
-					) as HTMLDialogElement | null;
+				// 	// - the wallet has found credentials for the username that was entered into the iframe by the user
+				// 	// - so we close the iframe and create a payment
+				// 	const iframeDialog = document.getElementById(
+				// 		WALLET_IFRAME_DIALOG_ID,
+				// 	) as HTMLDialogElement | null;
 
-					iframeDialog?.close();
-					iframeDialog?.removeAttribute("open");
-					iframeDialog?.classList.add("hidden");
+				// 	iframeDialog?.close();
+				// 	iframeDialog?.removeAttribute("open");
+				// 	iframeDialog?.classList.add("hidden");
 
-					// - resubmit the button click event to create the payment
-					await payWithSPC(
-						{
-							allowedCredentials: [e.data.credentialId],
-							challenge: "challenge",
-							timeout: 60000,
-						},
-						getPaymentDetails("1.00"),
-						"0x123...456",
-					);
-				}
+				// 	// - resubmit the button click event to create the payment
+				// 	await payWithSPC(
+				// 		{
+				// 			rpId: paymentOrigin,
+				// 			allowedCredentials: [e.data.credentialId],
+				// 			challenge: "challenge",
+				// 			timeout: 60000,
+				// 		},
+				// 		getPayeeOrigin(),
+				// 		getPaymentDetails("1.00"),
+				// 		"0x123...456",
+				// 	);
+				// }
 			});
 		</script>
 	</body>

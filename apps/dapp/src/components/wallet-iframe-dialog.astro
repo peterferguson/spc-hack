@@ -1,6 +1,6 @@
 ---
 import { cn } from "@/lib/utils";
-import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
+import { WALLET_IFRAME_DIALOG_ID } from "spc-lib";
 import { getPaymentOrigin } from "@/lib/utils";
 
 const paymentOrigin = getPaymentOrigin();
@@ -21,7 +21,7 @@ const paymentOrigin = getPaymentOrigin();
 		allow={`payment ${paymentOrigin}`}></iframe>
 </dialog>
 <script>
-	import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
+	import { WALLET_IFRAME_DIALOG_ID } from "spc-lib";
 	import { getPaymentOrigin } from "@/lib/utils";
 	const iframeDialog = document.getElementById(
 		WALLET_IFRAME_DIALOG_ID,
