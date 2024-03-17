@@ -1,6 +1,8 @@
 ---
 import "../../public/global.css";
 import { CreatePaymentButton } from "@/components/create-payment-button";
+import { NftImageCard } from "@/components/nft-image-card";
+
 import { getPaymentOrigin } from "@/lib/utils";
 
 const paymentOrigin = getPaymentOrigin();
@@ -21,11 +23,21 @@ import WalletIframeDialog from "@/components/wallet-iframe-dialog.astro";
 			<h1>SPC dApp</h1>
 
 			<div id="iframe-container" class="hidden">
-				<iframe name="iframe" allow={`payment ${paymentOrigin}`}></iframe>
+				<iframe name="iframe" allow={`payment ${paymentOrigin}`}
+				></iframe>
 			</div>
 
-			<WalletIframeDialog />
-			<CreatePaymentButton client:only />
+			<main
+				class="flex flex-row items-center justify-between min-h-[20vh] bg-red-300"
+			>
+				<main
+					class="flex flex-col items-center justify-evenly min-h-[20vh] bg-green-300"
+				>
+					<WalletIframeDialog />
+					<CreatePaymentButton client:only />
+				</main>
+				<NftImageCard client:only />
+			</main>
 		</main>
 		<script>
 			import { WALLET_IFRAME_DIALOG_ID } from "@/lib/constants";
