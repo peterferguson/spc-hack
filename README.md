@@ -53,7 +53,7 @@ Below is a demo journey of a user that has never used the [wallet provider](http
 
 ---
 
-## Deployments
+## Deployments
 
 - Dapp Frontend -> deployed at [https://spc-dapp.web.app](https://spc-dapp.web.app)
 
