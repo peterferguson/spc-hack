@@ -17,7 +17,7 @@ import {
 import type { Address } from "viem";
 import { baseSepolia } from "viem/chains";
 
-export function CreatePaymentButton() {
+export function ClaimCouponButton() {
 	return (
 		<Button
 			id="create-payment-button"

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { getNftUri, getBalance } from "@/lib/example-nft";
 import React from "react";
-import { CreatePaymentButton } from "./create-payment-button";
+import { ClaimCouponButton } from "./claim-coupon-button";
 import { useLocalStorage } from "usehooks-ts";
 import type { Address } from "viem";
 
@@ -41,7 +41,7 @@ export function NftImageCard() {
 					<p className="text-center">You have claimed</p>
 					// TODO: add the txHash of the claim
 				) : (
-					<CreatePaymentButton />
+					<ClaimCouponButton />
 				)}
 			</CardFooter>
 		</Card>
