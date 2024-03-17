@@ -50,7 +50,7 @@ export const POST: APIRoute = async (ctx) => {
 		});
 
 		return new Response(JSON.stringify({ address: deployAddress, txHash }), {
-			status: 204,
+			status: 200,
 		});
 	} catch (e) {
 		console.log("error", e);
